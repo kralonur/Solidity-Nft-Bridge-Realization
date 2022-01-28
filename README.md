@@ -1,46 +1,25 @@
-# Advanced Sample Hardhat Project
+# Solidity NFT Bridge Realization
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+This contract provides platform for swapping ERC721 token between different bridges.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+How it works: User uses `swap` function on Bridge contract to swap tokens from main chain. The contract transfers the users token to bridge address. However bridge does NOT burns the token but stores it. After token received bridge emits `SwapInitialized` event for backend to listen. On backend when `SwapInitialized` is received , validator signs new hash for second chain to redeem token. Then validator redeems the token from second chain (in other words second chain mints new token with exact same details of sent token from first chain). 
 
-Try running some of the following tasks:
+Note: Validator can burn the token on first chain if it's wanted (not implemented by default). But validator needs the burner role for it's to burn token from first chain.
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
-```
+## Development
 
-# Etherscan verification
+The contract is written with solidity.
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
+Hardhat development environment being used to write this contract.
 
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+The test coverage is %100 (result from solidity-coverage).
 
-```shell
-hardhat run --network ropsten scripts/sample-script.ts
-```
+For linting solhint and prettier is being used.
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
+Contract could be deployed to rinkeby testnet using infura api key and wallet private key.
+Environment file has to be created to use test network and contract validation. (.env.example file contains example template)
 
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
+Scripts folder contains the script for contract deployment.
 
-# Performance optimizations
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+For the easier contract interaction, hardhat tasks are created.
+To see the list of tasks, write `npx hardhat` to the terminal.
