@@ -1,25 +1,14 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { ERC721Nft, ERC721Nft__factory, Bridge, Bridge__factory } from "../typechain-types";
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
+  const [owner] = await ethers.getSigners();
+  const nftContract = await getTokenContract(owner);
+  const bridge = await getBridgeContract(owner, nftContract.address, owner.address);
 
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
+  console.log("nftContract deployed to:", nftContract.address);
+  console.log("bridge deployed to:", bridge.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -28,3 +17,20 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+
+async function getTokenContract(owner: SignerWithAddress) {
+  const tokenFactory = new ERC721Nft__factory(owner);
+  const tokenContract = await tokenFactory.deploy();
+  await tokenContract.deployed();
+
+  return tokenContract;
+}
+
+async function getBridgeContract(owner: SignerWithAddress, nftContractAddress: string, validatorAddress: string) {
+  const tokenFactory = new Bridge__factory(owner);
+  const tokenContract = await tokenFactory.deploy(nftContractAddress, validatorAddress);
+  await tokenContract.deployed();
+
+  return tokenContract;
+}
