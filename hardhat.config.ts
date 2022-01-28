@@ -1,4 +1,6 @@
 import * as dotenv from "dotenv";
+import "./tasks/bridge";
+import "./tasks/nft";
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
